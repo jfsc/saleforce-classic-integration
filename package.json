@@ -1,0 +1,79 @@
+{
+	"name": "salesforce-continous-integration",
+	"displayName": "Salesforce Continuous Integration",
+	"description": "A set of mechanisms and tools to improve the CI experience on Salesforce ",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.48.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "sfci.classic.package.export",
+				"title": "SFCI: Retrieve Classic Metadata"
+			},
+			{
+				"command": "sfci.classic.package.deploy",
+				"title": "SFCI: Deploy Classic Metadata"
+			}
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"when": "resourceExtname == .xml",
+					"command": "sfci.classic.package.export",
+					"group": "SFCI"
+				},
+				{
+					"when": "resourceExtname == .xml",
+					"command": "sfci.classic.package.deploy",
+					"group": "SFCI"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint src --ext ts",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"test": "node ./out/test/runTest.js"
+	},
+	"dependencies": {
+		"@types/cross-spawn": "^6.0.2",
+		"extract-zip": "2.0.1",
+		"ncp": "2.0.0",
+		"path-exists": "3.0.0",
+		"rxjs": "^6.6.2",
+		"shelljs": "0.8.3",
+		"trash": "^6.1.1",
+		"tree-kill": "^1.1.0",
+		"tsc": "^1.20150623.0"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.0",
+		"@types/node": "^14.0.27",
+		"@types/vscode": "^1.47.0",
+		"@typescript-eslint/eslint-plugin": "^3.8.0",
+		"@typescript-eslint/parser": "^3.8.0",
+		"eslint": "^7.6.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.0.1",
+		"typescript": "^3.9.7",
+		"vscode-test": "^1.4.0"
+	},
+	"repository": {
+	  "type": "git",
+	  "url": "git+https://github.com/forcedotcom/salesforcedx-vscode.git"
+	},
+	"license": "BSD-3-Clause"
+}
