@@ -29,9 +29,9 @@ async function exportPack() {
 			let _home =  workingwithpath.resolve(`${homedir}/.metadata`);
 			let _packpath = workingwithpath.normalize(`${_home}/package.xml`);
 			let _zippath = workingwithpath.normalize(`${_home}/unpackaged.zip`);		
-			let _sfdxpath = workingwithpath.normalize(`${wspaces[0].uri.path}/manifest/package.xml`);
-			let _sfdxmeta = workingwithpath.normalize(`${wspaces[0].uri.path}/metadata`);
-			let _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces[0].uri.path}`));
+			let _sfdxpath = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/manifest/package.xml`);
+			let _sfdxmeta = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/metadata`);
+			let _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces[0].uri.fsPath}`));
 			const {stdout} = await exec(`sfdx force:mdapi:retrieve -k "${_sfdxpath}" -r "${_home}" -u ${_defaultOrg} -s`);
 			await extractzip(`${_zippath}`,{ dir:`${_home}`});
 			await fs.unlinkSync(`${_packpath}`);
@@ -61,8 +61,8 @@ async function deployPack(uri:vscode.Uri) {
 			//let _home =  workingwithpath.resolve(`${homedir}/.metadata`);
 			// let _packpath = workingwithpath.normalize(`${_home}/package.xml`);
 			// let _zippath = workingwithpath.normalize(`${_home}/unpackaged.zip`);		
-			// let _sfdxpath = workingwithpath.normalize(`${wspaces[0].uri.path}/manifest/package.xml`);
-			// let _sfdxmeta = workingwithpath.normalize(`${wspaces[0].uri.path}/metadata`);
+			// let _sfdxpath = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/manifest/package.xml`);
+			// let _sfdxmeta = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/metadata`);
 			let _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
 			let _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces[0].uri.fsPath}`));
 			

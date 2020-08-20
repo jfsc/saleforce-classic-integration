@@ -72,8 +72,8 @@
 		"vscode-test": "^1.4.0"
 	},
 	"repository": {
-	  "type": "git",
-	  "url": "git+https://github.com/forcedotcom/salesforcedx-vscode.git"
+		"type": "git",
+		"url": "git+https://github.com/forcedotcom/salesforcedx-vscode.git"
 	},
 	"license": "BSD-3-Clause"
 }
