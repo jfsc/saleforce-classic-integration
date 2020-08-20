@@ -26,7 +26,7 @@ async function exportPack() {
 	outputChannel.show();
 	try {
 		if (wspaces){
-			let _home =  workingwithpath.resolve(`${homedir}/.metadata`);
+			let _home =  workingwithpath.resolve(`${homedir}/.sfci/metadata`);
 			let _packpath = workingwithpath.normalize(`${_home}/package.xml`);
 			let _zippath = workingwithpath.normalize(`${_home}/unpackaged.zip`);		
 			let _sfdxpath = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/manifest/package.xml`);

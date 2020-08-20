@@ -1,13 +1,13 @@
 {
-	"name": "salesforce-continous-integration",
-	"displayName": "Salesforce Continuous Integration",
-	"description": "A set of mechanisms and tools to improve the CI experience on Salesforce ",
-	"version": "0.0.1",
+	"name": "salesforce-classic-integration",
+	"displayName": "Salesforce Classic Integration",
+	"description": "Mechanisms to help developers to interact with Sanboxes/Org through classic metadata.",
+	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.48.0"
 	},
 	"categories": [
-		"Other"
+		"Languages","DevOps", "Salesforce", "Other"
 	],
 	"activationEvents": [
 		"*"
@@ -73,7 +73,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/forcedotcom/salesforcedx-vscode.git"
+		"url": "git+https://github.com/jfsc/saleforce-classic-integration.git"
 	},
 	"license": "BSD-3-Clause"
 }
