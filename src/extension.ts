@@ -71,13 +71,13 @@ async function deployPack(uri:vscode.Uri) {
 			const child = spawn(`sfdx`, [`force:mdapi:deploy`,
 			 `-d`,  `${_metadatapath}`,
 			`-u` ,  `${_defaultOrg}`, `-l`, `RunLocalTests`,
-			`-w`, `100`]);
+			`-w`, `100`], {shell: true});
 			child.stdout.on('data', (data:any) => {
-				//outputChannel.append(data);
+				outputChannel.append(`${data}`);
 				console.log(`child stdout:\n${data}`);
 			  });
 			  child.stderr.on('data', (data:any) => {
-				//outputChannel.append(data);
+				outputChannel.append(`${data}`);
 				console.error(`${data}`);
 			  });
 			// await extractzip(`${_zippath}`,{ dir:`${_home}`});
