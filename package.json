@@ -75,8 +75,8 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/jfsc/saleforce-classic-integration.git"
+		"url": "https://github.com/jfsc/saleforce-classic-integration.git"
 	},
 	"license": "BSD-3-Clause",
-	"icon": "images/go-logo-blue.png"
+	"icon": "images/sfci.png"
 }
