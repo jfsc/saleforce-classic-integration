@@ -55,9 +55,10 @@ async function deployPack(uri:vscode.Uri) {
 	try {
 		if (wspaces){
 			let _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
+			_metadatapath = `\"${_metadatapath}\"`;
 			let _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces[0].uri.fsPath}`));
 			const child = spawn(`sfdx`, [`force:mdapi:deploy`,
-			 `-d`,  `\"${_metadatapath}\"`,
+			 `-d`,  `${_metadatapath}`,
 			`-u` ,  `${_defaultOrg}`, `-l`, `NoTestRun`,
 			`-w`, `-1`], {shell: true});
 			child.stdout.on('data', (data:any) => {
