@@ -3,11 +3,13 @@
 	"displayName": "Salesforce Classic Integration",
 	"description": "Mechanisms to help developers to interact with Sanboxes/Org through classic metadata.",
 	"version": "1.0.0",
+	"publisher": "SFCI",
 	"engines": {
 		"vscode": "^1.48.0"
 	},
 	"categories": [
-		"Languages","DevOps", "Salesforce", "Other"
+		"Programming Languages",
+		"Other"
 	],
 	"activationEvents": [
 		"*"
