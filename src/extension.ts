@@ -22,7 +22,6 @@ var showNotification = true;
 async function exportPack() {
 	showProgressNotification("SFCI: Exporting metadata");
 	let wspaces = vscode.workspace.workspaceFolders;
-	// vscode.window.showInformationMessage('SFCI: Exporting metadata');
 	outputChannel.show();
 	try {
 		if (wspaces){
@@ -38,8 +37,6 @@ async function exportPack() {
 			await fs.unlinkSync(`${_zippath}`);
 			await ncp(`${_home}`,`${_sfdxmeta}`);
 			await trash(`${_home}`);
-			
-			//await fs.rmdirSync(`${_home}`, { recursive: true });
 			outputChannel.append(stdout);
 		}
 	} catch (error) {
@@ -54,23 +51,14 @@ async function exportPack() {
 async function deployPack(uri:vscode.Uri) {
 	showProgressNotification("SFCI: Deploying metadata");
 	let wspaces = vscode.workspace.workspaceFolders;
-	// vscode.window.showInformationMessage('SFCI: Exporting metadata');
 	outputChannel.show();
 	try {
 		if (wspaces){
-			//let _home =  workingwithpath.resolve(`${homedir}/.metadata`);
-			// let _packpath = workingwithpath.normalize(`${_home}/package.xml`);
-			// let _zippath = workingwithpath.normalize(`${_home}/unpackaged.zip`);		
-			// let _sfdxpath = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/manifest/package.xml`);
-			// let _sfdxmeta = workingwithpath.normalize(`${wspaces[0].uri.fsPath}/metadata`);
 			let _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
 			let _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces[0].uri.fsPath}`));
-			
-			//const {stdout, stderr} = await exec(`sfdx force:mdapi:deploy -d "/Users/fernando.fish/Development/Treinamento C6/sf_git_foundations-1/src-salesforce/" -u "${_defaultOrg}" -l RunLocalTests -w 100`);
-			//const child = spawn(`sfdx force:mdapi:deploy -d "/Users/fernando.fish/Development/Treinamento C6/sf_git_foundations-1/src-salesforce/" -u ${_defaultOrg} -l RunLocalTests -w 100`);
 			const child = spawn(`sfdx`, [`force:mdapi:deploy`,
-			 `-d`,  `${_metadatapath}`,
-			`-u` ,  `${_defaultOrg}`, `-l`, `RunLocalTests`,
+			 `-d`,  `"${_metadatapath}"`,
+			`-u` ,  `${_defaultOrg}`,
 			`-w`, `100`], {shell: true});
 			child.stdout.on('data', (data:any) => {
 				outputChannel.append(`${data}`);
@@ -80,14 +68,6 @@ async function deployPack(uri:vscode.Uri) {
 				outputChannel.append(`${data}`);
 				console.error(`${data}`);
 			  });
-			// await extractzip(`${_zippath}`,{ dir:`${_home}`});
-			// await fs.unlinkSync(`${_packpath}`);
-			// await fs.unlinkSync(`${_zippath}`);
-			// await ncp(`${_home}`,`${_sfdxmeta}`);
-			// await fs.unlinkSync(`${_home}`);
-			//outputChannel.append(stdout);
-			//outputChannel.append(stderr);
-			// vscode.window.showInformationMessage('SFCI: Metadata deployed');
 		}
 	} catch (error) {
 		vscode.window.showInformationMessage('SFCI: Error during metadata deploy');
