@@ -13,17 +13,18 @@ const ncp = require('ncp').ncp;
 
 suite('Deploy Classic Metadata', () => {
   vscode.window.showInformationMessage('Start all tests.');
-  test('Spaced path', () => {
+  test('Spaced path', (done) => {
     try {
       const dir = workingwithpath.normalize(`${homedir}/.sfci/tmp/Projeto X - foo bar/REPO_NAME/src-files`);
-      const wspace = vscode.workspace.rootPath;
-      const metadatasample = workingwithpath.normalize(`${wspace}/resources/metadata`);
+      const metadatasample = workingwithpath.normalize(`${__dirname}/../../../resources/metadata`);
       const uri = vscode.Uri.parse(`${dir}/metadata/package.xml`);
-      fs.mkdir(dir, { recursive: true }, (err:any) => { throw err; });
+      fs.mkdirSync(dir, { recursive: true }, (err:any) => { throw err; });
       ncp(`${metadatasample}`, `${dir}`);
-      myExtension.deployPack(uri);
+      // myExtension.deployPack(uri).catch((error) => { console.error(error); done() });
+      myExtension.deployPack(uri).catch((rej) => { console.error('huston we have a problem'); done(); throw new Error(rej); });
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      // console.error('Failed to run tests');
     }
   });
 });

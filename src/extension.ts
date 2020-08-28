@@ -51,28 +51,44 @@ async function exportPack () {
 }
 export async function deployPack (uri:vscode.Uri) {
   showProgressNotification('SFCI: Deploying metadata');
-  const wspaces = vscode.workspace.workspaceFolders;
+  const wspaces = getRootPath();
   outputChannel.show();
   try {
-    if (wspaces) {
-      let _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
-      _metadatapath = `\"${_metadatapath}\"`;
-      const _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces[0].uri.fsPath}`));
-      const child = spawn('sfdx', ['force:mdapi:deploy', '-d', `${_metadatapath}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true });
-      child.stdout.on('data', (data:any) => {
-        outputChannel.append(`${data}`);
-        console.log(`child stdout:\n${data}`);
-      });
-      child.stderr.on('data', (data:any) => {
-        outputChannel.append(`${data}`);
-        console.error(`${data}`);
-      });
-    }
+    const _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
+    const _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces.fsPath}`));
+    const child = await spawn('sfdx', ['force:mdapi:deploy', '-d', `${_metadatapath}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8' });
+    child.stdout.on('data', (data:any) => {
+      outputChannel.append(`${data}`);
+      console.log(`child stdout:\n${data}`);
+    });
+    child.stderr.on('data', (data:any) => {
+      outputChannel.append(`${data}`);
+      console.error(`${data}`);
+      throw new Error(data)
+    });
+    child.on('close', (code:any) => {
+      if (code !== 0) {
+        console.log(`ps process exited with code ${code}`);
+        throw new Error(code)
+      }
+      return Promise.resolve('resolve');
+    });
   } catch (error) {
     vscode.window.showInformationMessage('SFCI: Error during metadata deploy');
     showNotification = false;
+    console.error(`${error}`);
+    return Promise.reject(new Error(error))
+  } finally {
+    showNotification = false;
   }
-  showNotification = false;
+}
+function getRootPath ():vscode.Uri {
+  const rPath = vscode.workspace.workspaceFolders;
+  if (rPath) {
+    return rPath[0].uri;
+  } else {
+    return vscode.Uri.parse(workingwithpath.normalize(`${__dirname}/../`));
+  }
 }
 async function getDefaultOrg (rootFolder: string) {
   let userOrorg = `${NO_DEFAUL_ORG}`;
