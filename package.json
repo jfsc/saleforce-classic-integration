@@ -51,6 +51,7 @@
 	},
 	"dependencies": {
 		"@types/cross-spawn": "^6.0.2",
+		"escape-path-with-spaces": "^1.0.0",
 		"extract-zip": "2.0.1",
 		"ncp": "2.0.0",
 		"path-exists": "3.0.0",

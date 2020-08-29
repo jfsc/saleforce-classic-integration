@@ -18,6 +18,7 @@ const outputChannel = vscode.window.createOutputChannel('SFCI');
 const NO_DEFAUL_ORG = 'no_default_org';
 const readFilePromise = util.promisify(fs.readFile);
 const extractzip = require('extract-zip');
+const _homeSfciDeploy = `${homedir}/.sfci/tmp/deploy`;
 let showNotification = true;
 
 async function exportPack () {
@@ -55,29 +56,33 @@ export async function deployPack (uri:vscode.Uri) {
   outputChannel.show();
   try {
     const _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
+    fs.mkdirSync(_homeSfciDeploy, { recursive: true }, (err:any) => { throw err; });
     const _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces.fsPath}`));
-    const child = await spawn('sfdx', ['force:mdapi:deploy', '-d', `${_metadatapath}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8' });
+    await ncp(`${_metadatapath}`, `${_homeSfciDeploy}`);
+    const child = await spawn('sfdx', ['force:mdapi:deploy', '-d', `${_homeSfciDeploy}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
     child.stdout.on('data', (data:any) => {
       outputChannel.append(`${data}`);
       console.log(`child stdout:\n${data}`);
     });
     child.stderr.on('data', (data:any) => {
       outputChannel.append(`${data}`);
-      console.error(`${data}`);
-      throw new Error(data)
+      console.log(`${data}`);
+      // throw new Error('error')
     });
     child.on('close', (code:any) => {
       if (code !== 0) {
-        console.log(`ps process exited with code ${code}`);
-        throw new Error(code)
+        console.log(`sfdx process exited with code ${code}`);
+        throw new Error(code);
       }
+      trash(`${_homeSfciDeploy}`);
       return Promise.resolve('resolve');
     });
   } catch (error) {
     vscode.window.showInformationMessage('SFCI: Error during metadata deploy');
     showNotification = false;
     console.error(`${error}`);
-    return Promise.reject(new Error(error))
+    trash(`${_homeSfciDeploy}`);
+    return 'error'
   } finally {
     showNotification = false;
   }
