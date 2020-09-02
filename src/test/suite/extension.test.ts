@@ -6,6 +6,7 @@
 // as well as import your extension to test it
 import * as vscode from 'vscode';
 import * as myExtension from '../../extension';
+import { fail } from 'assert';
 const fs = require('fs');
 const workingwithpath = require('path');
 const homedir = require('os').homedir();
@@ -20,22 +21,23 @@ suite('Deploy Classic Metadata', () => {
       const uri = vscode.Uri.file(`${dir}/package.xml`);
       fs.mkdirSync(dir, { recursive: true }, (err:any) => { throw err; });
       ncp(`${metadatasample}`, `${dir}`);
-      myExtension.deployPack(uri).then((resolve) => {
+      myExtension.deployPack(uri).then(function (result) {
         const intervalId = setInterval(() => {
-          if (resolve === 'resolve') {
+          console.log(result);
+          if (result === 'resolve') {
             // console.log('UNDEFINED')
             clearInterval(intervalId);
             done();
           }
-        }, 40000);
+        }, 3000);
       }).catch((reject) => {
         const intervalId = setInterval(() => {
-          if (reject === 'error') {
+          if (reject === 1) {
             console.log('ihhuuuu')
             clearInterval(intervalId);
-            done();
+            fail('Deploy failed');
           }
-        }, 40000);
+        }, 3000);
       });
     } catch (error) {
       console.log(error);

@@ -19,7 +19,7 @@ const outputChannel = vscode.window.createOutputChannel('SFCI');
 const NO_DEFAUL_ORG = 'no_default_org';
 const readFilePromise = util.promisify(fs.readFile);
 const extractzip = require('extract-zip');
-const _homeSfciDeploy = `${homedir}/.sfci/tmp/deploy`;
+const _homeSfciDeploy = workingwithpath.normalize(`${homedir}/.sfci/tmp/deploy`);
 let showNotification = true;
 
 export async function exportPack () {
@@ -57,32 +57,35 @@ export async function deployPack (uri:vscode.Uri) {
   outputChannel.show();
   outputChannel.append('Starting deploy .... it can get some time ;)\n');
   try {
-    await isAccessible(_homeSfciDeploy).catch((reject) => {
-      trash(`${_homeSfciDeploy}`);
+    await isAccessible(_homeSfciDeploy).catch(async (reject) => {
+      await trash(`${_homeSfciDeploy}`);
     });
-    const _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
-    await fs.mkdirSync(_homeSfciDeploy, { recursive: true }, (err:any) => { throw err; });
     const _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces.fsPath}`));
+    const _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
+    await fs.mkdir(_homeSfciDeploy, { recursive: true }, (err:any) => { if (err) throw err; });
     await ncp(`${_metadatapath}`, `${_homeSfciDeploy}`);
-    const child = await spawn('sfdx', ['force:mdapi:deploy', '-d', `${_homeSfciDeploy}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
-    child.stdout.on('data', (data:any) => {
-      outputChannel.append(`${data}`);
-      console.log(`child stdout:\n${data}`);
-    });
-    child.stderr.on('data', (data:any) => {
-      outputChannel.append(`${data}`);
-      console.log(`${data}`);
-      // throw new Error('error')
-    });
-    child.on('close', (code:any) => {
-      if (code !== 0) {
-        console.log(`sfdx process exited with code ${code}`);
-        throw new Error(code);
-      }
-      trash(`${_homeSfciDeploy}`);
-      console.log('deploy acao concluida com sucesso');
-      outputChannel.append('Deployed');
-      return Promise.resolve('resolve');
+    return new Promise(function (resolve, reject) {
+      const child = spawn('sfdx', ['force:mdapi:deploy', '-d', `${_homeSfciDeploy}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+      child.stdout.on('data', (data:any) => {
+        outputChannel.append(`${data}`);
+        console.log(`child stdout:\n${data}`);
+      });
+      child.stderr.on('data', (data:any) => {
+        outputChannel.append(`${data}`);
+        console.log(`${data}`);
+        // throw new Error('error')
+      });
+      child.on('close', (code:any) => {
+        if (code !== 0) {
+          console.log(`sfdx process exited with code ${code}`);
+          reject(code);
+        } else {
+          trash(`${_homeSfciDeploy}`);
+          console.log('deploy: acao concluida com sucesso');
+          outputChannel.append('Deployed');
+          resolve('resolve');
+        }
+      });
     });
   } catch (error) {
     vscode.window.showInformationMessage('SFCI: Error during metadata deploy');
