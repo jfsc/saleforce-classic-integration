@@ -55,6 +55,7 @@ export async function deployPack (uri:vscode.Uri) {
   showProgressNotification('SFCI: Deploying metadata');
   const wspaces = getRootPath();
   outputChannel.show();
+  outputChannel.append('Starting deploy .... it can get some time ;)\n');
   try {
     await isAccessible(_homeSfciDeploy).catch((reject) => {
       trash(`${_homeSfciDeploy}`);
