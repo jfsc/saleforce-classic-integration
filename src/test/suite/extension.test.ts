@@ -11,6 +11,7 @@ const fs = require('fs');
 const workingwithpath = require('path');
 const homedir = require('os').homedir();
 const ncp = require('ncp').ncp;
+const trash = require('trash');
 
 suite('Deploy Classic Metadata', () => {
   vscode.window.showInformationMessage('Start all Deploy tests.');
@@ -19,22 +20,27 @@ suite('Deploy Classic Metadata', () => {
       const dir = workingwithpath.normalize(`${homedir}/.sfci/tmp/Projeto X - foo bar/src-salesforce`);
       const metadatasample = workingwithpath.normalize(`${__dirname}/../../../resources/metadata/`);
       const uri = vscode.Uri.file(`${dir}/package.xml`);
-      fs.mkdirSync(dir, { recursive: true }, (err:any) => { throw err; });
-      ncp(`${metadatasample}`, `${dir}`);
+      fs.mkdir(dir, { recursive: true }, (err:Error) => { if (err) { console.error('FALHA NA CRIACAO DA PASTA'); throw err; } });
+      ncp(`${metadatasample}`, `${dir}`, { clobber: false }, function (err:Error) {
+        if (err) {
+          return console.error(err);
+        } else { console.log('COPIA DE METADADOS PARA TESTES DE DEPLOY REALIZDA COM SUCESSO!'); }
+      });
       myExtension.deployPack(uri).then(function (result) {
         const intervalId = setInterval(() => {
           console.log(result);
           if (result === 'resolve') {
             // console.log('UNDEFINED')
             clearInterval(intervalId);
+            trash(`${dir}`);
             done();
           }
         }, 3000);
       }).catch((reject) => {
         const intervalId = setInterval(() => {
           if (reject === 1) {
-            console.log('ihhuuuu')
             clearInterval(intervalId);
+            trash(`${dir}`);
             fail('Deploy failed');
           }
         }, 3000);
@@ -45,11 +51,11 @@ suite('Deploy Classic Metadata', () => {
     }
   });
 
-  // test('Retrieve', (done) => {
-  //   try {
-  //     myExtension.exportPack();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
+  test('Retrieve', (done) => {
+    try {
+      myExtension.exportPack();
+    } catch (error) {
+      console.log(error);
+    }
+  });
 });
