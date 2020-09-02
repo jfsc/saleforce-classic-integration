@@ -6,6 +6,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode'
 import { ProgressLocation } from 'vscode';
+import * as oldfs from 'fs';
 const util = require('util');
 const fs = require('fs');
 const trash = require('trash');
@@ -21,7 +22,7 @@ const extractzip = require('extract-zip');
 const _homeSfciDeploy = `${homedir}/.sfci/tmp/deploy`;
 let showNotification = true;
 
-async function exportPack () {
+export async function exportPack () {
   showProgressNotification('SFCI: Exporting metadata');
   const wspaces = vscode.workspace.workspaceFolders;
   outputChannel.show();
@@ -55,8 +56,11 @@ export async function deployPack (uri:vscode.Uri) {
   const wspaces = getRootPath();
   outputChannel.show();
   try {
+    await isAccessible(_homeSfciDeploy).catch((reject) => {
+      trash(`${_homeSfciDeploy}`);
+    });
     const _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
-    fs.mkdirSync(_homeSfciDeploy, { recursive: true }, (err:any) => { throw err; });
+    await fs.mkdirSync(_homeSfciDeploy, { recursive: true }, (err:any) => { throw err; });
     const _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces.fsPath}`));
     await ncp(`${_metadatapath}`, `${_homeSfciDeploy}`);
     const child = await spawn('sfdx', ['force:mdapi:deploy', '-d', `${_homeSfciDeploy}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
@@ -75,6 +79,8 @@ export async function deployPack (uri:vscode.Uri) {
         throw new Error(code);
       }
       trash(`${_homeSfciDeploy}`);
+      console.log('deploy acao concluida com sucesso');
+      outputChannel.append('Deployed');
       return Promise.resolve('resolve');
     });
   } catch (error) {
@@ -82,11 +88,22 @@ export async function deployPack (uri:vscode.Uri) {
     showNotification = false;
     console.error(`${error}`);
     trash(`${_homeSfciDeploy}`);
-    return 'error'
+    return Promise.reject(error);
   } finally {
     showNotification = false;
   }
 }
+
+async function isAccessible (dir:any) {
+  try {
+    await fs.access(dir, oldfs.constants.F_OK | oldfs.constants.W_OK | oldfs.constants.R_OK);
+  } catch (error) {
+    console.log(`${dir} is not exists / writable / readable`);
+    return Promise.reject(error);
+  }
+  return Promise.resolve('resolve');
+}
+
 function getRootPath ():vscode.Uri {
   const rPath = vscode.workspace.workspaceFolders;
   if (rPath) {

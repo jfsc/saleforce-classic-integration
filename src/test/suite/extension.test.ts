@@ -12,7 +12,7 @@ const homedir = require('os').homedir();
 const ncp = require('ncp').ncp;
 
 suite('Deploy Classic Metadata', () => {
-  vscode.window.showInformationMessage('Start all tests.');
+  vscode.window.showInformationMessage('Start all Deploy tests.');
   test('Spaced path', (done) => {
     try {
       const dir = workingwithpath.normalize(`${homedir}/.sfci/tmp/Projeto X - foo bar/src-salesforce`);
@@ -20,9 +20,9 @@ suite('Deploy Classic Metadata', () => {
       const uri = vscode.Uri.file(`${dir}/package.xml`);
       fs.mkdirSync(dir, { recursive: true }, (err:any) => { throw err; });
       ncp(`${metadatasample}`, `${dir}`);
-      myExtension.deployPack(uri).then(result => {
+      myExtension.deployPack(uri).then((resolve) => {
         const intervalId = setInterval(() => {
-          if (result === undefined) {
+          if (resolve === 'resolve') {
             // console.log('UNDEFINED')
             clearInterval(intervalId);
             done();
@@ -42,4 +42,12 @@ suite('Deploy Classic Metadata', () => {
       // console.error('Failed to run tests');
     }
   });
+
+  // test('Retrieve', (done) => {
+  //   try {
+  //     myExtension.exportPack();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // });
 });
