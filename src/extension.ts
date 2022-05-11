@@ -62,8 +62,10 @@ export async function deployPack (uri:vscode.Uri) {
     });
     const _defaultOrg = await getDefaultOrg(workingwithpath.normalize(`${wspaces.fsPath}`));
     const _metadatapath = workingwithpath.normalize(`${uri.fsPath}/../`);
+    const _filesPath = workingwithpath.normalize(`${uri.fsPath}/../../metadata`);
     await fs.mkdir(_homeSfciDeploy, { recursive: true }, (err:any) => { if (err) throw err; });
     await ncp(`${_metadatapath}`, `${_homeSfciDeploy}`);
+    await ncp(`${_filesPath}`, `${_homeSfciDeploy}`);
     return new Promise(function (resolve, reject) {
       const child = spawn('sfdx', ['force:mdapi:deploy', '-d', `${_homeSfciDeploy}`, '-u', `${_defaultOrg}`, '-l', 'NoTestRun', '-w', '-1'], { shell: true, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
       child.stdout.on('data', (data:any) => {
